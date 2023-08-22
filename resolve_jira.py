@@ -3,21 +3,36 @@ import collections
 import configparser
 import pprint
 
+
+import sys
+ 
 # Token=<your github access token>
 config = configparser.ConfigParser()
 config.read('.credentials')
 
 jira = JIRA(basic_auth=(config['DEFAULT']['JIRA_USER'], config['DEFAULT']['JIRA_TOKEN']), options={'server':config['DEFAULT']['SERVER']})
 
-query = 'project = DOWN AND key = DOWN-59'
-resolved = jira.search_issues(query, json_result=True)
-#issue = resolved[0]
-print(resolved)
-#print(issue.fields.priority)
-#issue.update(fields={'priority': {'id': '4'}})
-#print(issue.fields.priority)
+id = str(sys.argv[1])
+priority = str(sys.argv[2]) if len(sys.argv) > 2 else ''
 
-#issue.update(fields={'customfield_10484': {'completedCycles': {'startTime': 'Thursday 10:28 AM'}}})
+
+query = 'project = DOWN AND key = ' + id
+resolved = jira.search_issues(query)
+#
+print(resolved)
+issue = resolved[0]
+print(issue.fields.resolution)
+print(issue.fields.resolutiondate)
+
+#for field_name in issue.raw['fields']:
+    #print("Field:", field_name, "Value:", issue.raw['fields'][field_name])
+
+"""
+if (len(priority)):
+    issue.update(fields={'priority': {'id': priority}})
+    print(issue.fields.priority)
+ """
+issue.update(fields={'resolution': 'Done'})
 
 
 """
